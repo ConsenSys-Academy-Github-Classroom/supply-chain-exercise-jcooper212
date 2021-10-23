@@ -9,7 +9,6 @@ contract SupplyChain {
 
   // <skuCount>
   uint public skuCount;
-//  uint public dbgPrice;
 
   // <items mapping>
   mapping (uint => Item) public items;
@@ -52,7 +51,6 @@ contract SupplyChain {
     require (owner == _address);
     _;
   }
-
   modifier verifyCaller (uint _sku, State _state) {
       if (_state == State.Shipped){
         require (msg.sender == items[_sku].seller);
@@ -68,29 +66,14 @@ contract SupplyChain {
     _;
   }
 
-  modifier checkValue2(uint _sku, uint _val) {
-    uint _price = items[_sku].price;
-    uint buyerBal =  items[_sku].buyer.balance;
-    uint sellerBal = items[_sku].seller.balance;
-    _;
-    //require(buyerBal - items[_sku].buyer.balance == _val - _price);
-    require(items[_sku].seller.balance - sellerBal== _price);
-
+  modifier checkValue(uint _sku) {
     //refund them after pay for item (why it is before, _ checks for logic before func)
-    //require(items[_sku].sku != 0);
+    require(items[_sku].sku != 0);
 
     //uint _price = items[_sku].price;
     //uint amountToRefund = msg.value - _price;
     //items[_sku].buyer.transfer(amountToRefund);
     _;
-  }
-  modifier checkValue(uint _sku) {
-    _;
-    uint _price = items[_sku].price;
-    uint amountToRefund = msg.value - _price;
-    address payable buyer = payable(items[_sku].buyer);
-
-    buyer.transfer(amountToRefund);
   }
 
   // For each of the following modifiers, use what you learned about modifiers
@@ -168,15 +151,14 @@ contract SupplyChain {
   //    - check the value after the function is called to make
   //      sure the buyer is refunded any excess ether sent.
   // 6. call the event associated with this function!
-  function buyItem(uint sku) public payable forSale(sku) paidEnough(sku) checkValue(sku)  {
+  function buyItem(uint sku) public payable forSale(sku) checkValue(sku) paidEnough(sku){
 
       items[sku].buyer = payable(msg.sender);
       address payable seller = payable(items[sku].seller);
       address payable buyer = payable(items[sku].buyer);
       items[sku].state = State.Sold;
       seller.transfer(items[sku].price);
-    /////  buyer.transfer(msg.value - items[sku].price); //called in checkValue
-      //dbgPrice = msg.value - items[sku].price;
+      //buyer.transfer(msg.value - items[sku].price);
       emit LogSold(sku);
   }
 
@@ -197,7 +179,7 @@ contract SupplyChain {
   // 3. Call the event associated with this function!
   function receiveItem(uint sku) public shipped(sku) verifyCaller(sku, State.Received){
       items[sku].state = State.Received;
-      emit LogReceived(sku);
+      emit LogShipped(sku);
   }
 
   // Uncomment the following code block. it is needed to run tests

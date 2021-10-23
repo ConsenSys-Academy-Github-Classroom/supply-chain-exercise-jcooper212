@@ -71,81 +71,81 @@ contract("SupplyChain", function (accounts) {
       before(() => {
         subjectStruct = ItemStruct(SupplyChain);
         assert(
-          subjectStruct !== null, 
+          subjectStruct !== null,
           "The contract should define an `Item Struct`"
         );
       });
 
       it("should have a `name`", () => {
         assert(
-          isDefined(subjectStruct)("name"), 
+          isDefined(subjectStruct)("name"),
           "Struct Item should have a `name` member"
         );
         assert(
-          isType(subjectStruct)("name")("string"), 
+          isType(subjectStruct)("name")("string"),
           "`name` should be of type `string`"
         );
       });
 
       it("should have a `sku`", () => {
         assert(
-          isDefined(subjectStruct)("sku"), 
+          isDefined(subjectStruct)("sku"),
           "Struct Item should have a `sku` member"
         );
         assert(
-          isType(subjectStruct)("sku")("uint"), 
+          isType(subjectStruct)("sku")("uint"),
           "`sku` should be of type `uint`"
         );
       });
 
       it("should have a `price`", () => {
         assert(
-          isDefined(subjectStruct)("price"), 
+          isDefined(subjectStruct)("price"),
           "Struct Item should have a `price` member"
         );
         assert(
-          isType(subjectStruct)("price")("uint"), 
+          isType(subjectStruct)("price")("uint"),
           "`price` should be of type `uint`"
         );
       });
 
       it("should have a `state`", () => {
         assert(
-          isDefined(subjectStruct)("state"), 
+          isDefined(subjectStruct)("state"),
           "Struct Item should have a `state` member"
         );
         assert(
-          isType(subjectStruct)("state")("State"), 
+          isType(subjectStruct)("state")("State"),
           "`state` should be of type `State`"
         );
       });
 
       it("should have a `seller`", () => {
         assert(
-          isDefined(subjectStruct)("seller"), 
+          isDefined(subjectStruct)("seller"),
           "Struct Item should have a `seller` member"
         );
         assert(
-          isType(subjectStruct)("seller")("address"), 
+          isType(subjectStruct)("seller")("address"),
           "`seller` should be of type `address`"
         );
         assert(
-          isPayable(subjectStruct)("seller"), 
+          isPayable(subjectStruct)("seller"),
           "`seller` should be payable"
         );
       });
 
       it("should have a `buyer`", () => {
         assert(
-          isDefined(subjectStruct)("buyer"), 
+          isDefined(subjectStruct)("buyer"),
           "Struct Item should have a `buyer` member"
         );
         assert(
-          isType(subjectStruct)("buyer")("address"), 
+          isType(subjectStruct)("buyer")("address"),
           "`buyer` should be of type `address`"
         );
         assert(
-          isPayable(subjectStruct)("buyer"), 
+          isPayable(subjectStruct)("buyer"),
           "`buyer` should be payable"
         );
       });
@@ -204,6 +204,7 @@ contract("SupplyChain", function (accounts) {
       await instance.addItem(name, price, { from: alice });
       var aliceBalanceBefore = await web3.eth.getBalance(alice);
       var bobBalanceBefore = await web3.eth.getBalance(bob);
+      //console.log("look ", aliceBalanceBefore/1e18, bobBalanceBefore/1e18, excessAmount)
 
       await instance.buyItem(0, { from: bob, value: excessAmount });
 
@@ -211,6 +212,7 @@ contract("SupplyChain", function (accounts) {
       var bobBalanceAfter = await web3.eth.getBalance(bob);
 
       const result = await instance.fetchItem.call(0);
+      //console.log("look after ", aliceBalanceBefore, bobBalanceBefore, excessAmount, result[3].toString(10))
 
       assert.equal(
         result[3].toString(10),
